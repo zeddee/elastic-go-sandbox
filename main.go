@@ -14,7 +14,8 @@ func main() {
 
 	//exampleOne()
 	//exampleTwo()
-	exampleThree()
+	//exampleThree()
+	exampleFour()
 
 	//a.getLoop()
 }
@@ -94,6 +95,36 @@ func exampleThree() {
 	`
 	a.Post("customer/_doc/1/_update?pretty", payload3)
 	a.Get("customer/_doc/1")
+
+	a.Delete("customer")    // cleanup by deleting customer index
+	a.Get("_cat/indices?v") // get list of indexes/indices
+}
+
+// https://www.elastic.co/guide/en/elasticsearch/reference/current/getting-started-batch-processing.html
+// bulk operation using bulk endpoint
+func exampleFour() {
+	payload := `
+	{"index": {"_id": "1"}}
+	{"name": "John Doe"}
+	{"index": {"_id": "2"}}
+	{"name": "Jane Doe"}
+	`
+
+	// _bulk operation must be terminated with \n character
+	// for some reason, this cannot be done in "payload";
+	// may have something to do with how backticks work.
+	a.Post("customer/_doc/_bulk?pretty", payload+"\n")
+	a.Get("customer/_doc/1?pretty")
+	a.Get("customer/_doc/2?pretty")
+
+	payload2 := `
+	{"update": {"_id": "1"}}
+	{"doc": {"name": "John Doe becomes Jane Doe"}}
+	{"delete": {"_id": "2"}}
+	`
+	a.Post("customer/_doc/_bulk?pretty", payload2+"\n")
+	a.Get("customer/_doc/1?pretty")
+	a.Get("customer/_doc/2?pretty")
 
 	a.Delete("customer")    // cleanup by deleting customer index
 	a.Get("_cat/indices?v") // get list of indexes/indices
