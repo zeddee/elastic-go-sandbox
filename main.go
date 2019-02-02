@@ -16,26 +16,66 @@ func main() {
 	if err := godotenv.Load(); err != nil {
 		log.Fatal(err)
 	}
-	getLoop()
+
+	getOne("_cat/health?v")  // get cluster health
+	getOne("_cat/nodes?v")   // get node list
+	getOne("_cat/indices?v") // get list of indexes/indices
+
+	putOne("customer?pretty", "") // Add an index
+	getOne("_cat/indices?v")      // get list of indexes/indices
+
+	// Add document to index, with payload
+	payload := `
+			{
+				"name": "Jane Doe"
+			}
+			`
+	putOne("customer/_doc/1?pretty", payload)
+
+	getOne("customer") // get list of documents at customer
+
+	deleteOne("customer") // cleanup by deleting customer index
+	//getLoop()
 }
 
-func getLoop() {
-	for {
-		fmt.Printf("Please enter the path to GET\n")
-		input := readStringStdin()
-		if input == "" {
-			break
-		}
-		val, err := getThis(input)
-		if err != nil {
-			log.Println(err)
-		}
-		fmt.Printf("Response: %s\n", val)
+func putOne(path string, data string) {
+	res, err := putThis(path, data)
+	if err != nil {
+		log.Println(err)
 	}
+	fmt.Printf("PUT result: %s\n", res)
 }
 
-func getThis(url string) ([]byte, error) {
-	req, err := http.NewRequest("GET", os.Getenv("ELASTIC_BASEURL")+"/"+url, nil)
+func getOne(path string) {
+	val, err := getThis(path)
+	if err != nil {
+		log.Println(err)
+	}
+	fmt.Printf("%s\n", val)
+}
+
+func deleteOne(path string) {
+	res, err := deleteThis(path)
+	if err != nil {
+		log.Println(err)
+	}
+	fmt.Printf("DELETE result: %s\n", res)
+}
+
+func getThis(path string) (resBody []byte, error error) {
+	return newRequest(http.MethodGet, path, "")
+}
+
+func putThis(path string, data string) (resBody []byte, error error) {
+	return newRequest(http.MethodPut, path, data)
+}
+
+func deleteThis(path string) (resBody []byte, error error) {
+	return newRequest(http.MethodDelete, path, "")
+}
+
+func newRequest(method string, path string, data string) ([]byte, error) {
+	req, err := http.NewRequest(method, os.Getenv("ELASTIC_BASEURL")+"/"+path, strings.NewReader(data))
 	if err != nil {
 		return nil, fmt.Errorf("could not make request: %s", err)
 	}
@@ -53,6 +93,21 @@ func getThis(url string) ([]byte, error) {
 	}
 
 	return body, nil
+}
+
+func getLoop() {
+	for {
+		fmt.Printf("Please enter the path to GET\n")
+		input := readStringStdin()
+		if input == "" {
+			break
+		}
+		val, err := getThis(input)
+		if err != nil {
+			log.Println(err)
+		}
+		fmt.Printf("Response: %s\n", val)
+	}
 }
 
 func readStringStdin() string {
