@@ -10,13 +10,26 @@ import (
 	"strings"
 )
 
+const sep = "=======================\n"
+
 // Put wraps a put call to the elasticsearch server REST API
 func Put(path string, data string) {
 	res, err := putThis(path, data)
 	if err != nil {
 		log.Println(err)
 	}
+	fmt.Printf(sep)
 	fmt.Printf("PUT result: %s\n", res)
+}
+
+// Post wraps a post call to the elasticsearch server REST API
+func Post(path string, data string) {
+	res, err := postThis(path, data)
+	if err != nil {
+		log.Println(err)
+	}
+	fmt.Printf(sep)
+	fmt.Printf("POST result: %s\n", res)
 }
 
 // Get wraps a get call to the elasticsearch server REST API
@@ -25,6 +38,7 @@ func Get(path string) {
 	if err != nil {
 		log.Println(err)
 	}
+	fmt.Printf(sep)
 	fmt.Printf("%s\n", val)
 }
 
@@ -34,6 +48,7 @@ func Delete(path string) {
 	if err != nil {
 		log.Println(err)
 	}
+	fmt.Printf(sep)
 	fmt.Printf("DELETE result: %s\n", res)
 }
 
@@ -43,6 +58,10 @@ func getThis(path string) (resBody []byte, error error) {
 
 func putThis(path string, data string) (resBody []byte, error error) {
 	return newRequest(http.MethodPut, path, data)
+}
+
+func postThis(path string, data string) (resBody []byte, error error) {
+	return newRequest(http.MethodPost, path, data)
 }
 
 func deleteThis(path string) (resBody []byte, error error) {
@@ -73,6 +92,7 @@ func newRequest(method string, path string, data string) ([]byte, error) {
 // CLI wraps a for loop that starts getting input from stdin to parse as CLI commands
 func CLI() {
 	for {
+		fmt.Printf(sep)
 		fmt.Printf("Please enter the path to GET\n")
 		input := readStringStdin()
 		if input == "" {
