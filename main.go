@@ -4,8 +4,7 @@ import (
 	"log"
 
 	"github.com/joho/godotenv"
-	a "github.com/zeddee/elastic-go-sandbox/apicalls"
-	"github.com/zeddee/elastic-go-sandbox/common"
+	"github.com/zeddee/elastic-go-sandbox/exploringdata"
 )
 
 func main() {
@@ -17,23 +16,9 @@ func main() {
 	// basicoperations.exampleTwo()
 	// basicoperations.exampleThree()
 	// basicoperations.exampleFour()
-	loadElasticData()
 	// a.getLoop()
-	defer cleanup()
-}
 
-// https://www.elastic.co/guide/en/elasticsearch/reference/current/getting-started-explore-data.html
-func loadElasticData() {
-	payload, err := common.LoadElasticJSON("data/accounts.json")
-	if err != nil {
-		log.Println(err)
-	}
+	exploringdata.LoadData()
 
-	a.Post("bank/_doc/_bulk?pretty&refresh", payload)
-	a.Get("_cat/indices?v")
-}
-
-func cleanup() {
-	a.Delete("bank")        // cleanup by deleting customer index
-	a.Get("_cat/indices?v") // get list of indexes/indices
+	defer exploringdata.Cleanup()
 }
