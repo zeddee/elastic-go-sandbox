@@ -42,6 +42,16 @@ func Get(path string) {
 	fmt.Printf("%s\n", val)
 }
 
+// GetWithJSONQuery wraps a GET call + request body to the elasticsearch server REST API
+func GetWithJSONQuery(path string, data string) {
+	res, err := getThisWithReqBody(path, data)
+	if err != nil {
+		log.Println(err)
+	}
+	fmt.Printf(sep)
+	fmt.Printf("GET+ result: %s\n", res)
+}
+
 // Delete wraps a delete call to the elasticsearch server REST API
 func Delete(path string) {
 	res, err := deleteThis(path)
@@ -54,6 +64,10 @@ func Delete(path string) {
 
 func getThis(path string) (resBody []byte, error error) {
 	return newRequest(http.MethodGet, path, "")
+}
+
+func getThisWithReqBody(path, data string) (resBody []byte, error error) {
+	return newRequest(http.MethodGet, path, data)
 }
 
 func putThis(path string, data string) (resBody []byte, error error) {

@@ -12,13 +12,11 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// basicoperations.exampleOne()
-	// basicoperations.exampleTwo()
-	// basicoperations.exampleThree()
-	// basicoperations.exampleFour()
+	// basicoperations.ExampleOne()
+	// basicoperations.ExampleTwo()
+	// basicoperations.ExampleThree()
+	// basicoperations.ExampleFour()
 	// a.getLoop()
 
-	exploringdata.LoadData()
-
-	defer exploringdata.Cleanup()
+	exploringdata.Example()
 }

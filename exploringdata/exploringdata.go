@@ -9,6 +9,18 @@ import (
 	"github.com/zeddee/elastic-go-sandbox/common"
 )
 
+// Example wraps all the exploring data guide calls
+func Example() {
+	LoadData()
+	//Search("bank", "*&sort=account_number:asc&pretty") // Search using GET query
+
+	// Same query using alternative request body method
+	payload := `{"query": { "match_all": {} },"sort": [{ "account_number":"asc"}]}`
+	a.GetWithJSONQuery("bank/_search", payload)
+
+	Cleanup()
+}
+
 // LoadData loads the prescribed dataset
 func LoadData() {
 	payload, err := common.LoadElasticJSON("data/accounts.json")
@@ -24,4 +36,9 @@ func LoadData() {
 func Cleanup() {
 	a.Delete("bank")        // cleanup by deleting customer index
 	a.Get("_cat/indices?v") // get list of indexes/indices
+}
+
+// Search runs a query on a given index
+func Search(index, query string) {
+	a.Get(index + "/_search?q=" + query)
 }
