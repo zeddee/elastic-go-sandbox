@@ -14,7 +14,7 @@ func Example() {
 	LoadData()
 	//Search("bank", "*&sort=account_number:asc&pretty") // Search using GET query
 
-	// Same query using alternative request body method
+	// Same query using alternative request body method using Elasticsearch Query DSL
 	payload := `{"query": { "match_all": {} },"sort": [{ "account_number":"asc"}]}`
 	a.GetWithJSONQuery("bank/_search", payload)
 
